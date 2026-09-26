@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+model User {
+  id             Int       @id @default(autoincrement())
+  email          String    @unique
+  hashedPassword String
+  createdAt      DateTime  @default(now())
+  bookings       Booking[]
+
+  @@map("users")
+}
+
+model DiagnosticCentre {
+  id       Int              @id @default(autoincrement())
+  name     String
+  location String
+  tests    DiagnosticTest[]
+  bookings Booking[]
+
+  @@map("diagnostic_centres")
+}
+
+model DiagnosticTest {
+  id       Int              @id @default(autoincrement())
+  centreId Int              @map("centre_id")
+  centre   DiagnosticCentre @relation(fields: [centreId], references: [id])
+  name     String
+  price    Float
+  bookings Booking[]
+
+  @@map("diagnostic_tests")
+}
+
+model Booking {
+  id               Int              @id @default(autoincrement())
+  userId           Int              @map("user_id")
+  user             User             @relation(fields: [userId], references: [id])
+  testId           Int              @map("test_id")
+  test             DiagnosticTest   @relation(fields: [testId], references: [id])
+  centreId         Int              @map("centre_id")
+  centre           DiagnosticCentre @relation(fields: [centreId], references: [id])
+  appointmentTime  DateTime         @map("appointment_time")
+  amount           Float
+  status           BookingStatus    @default(PENDING)
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+  payments         Payment[]
+
+  @@map("bookings")
+}
+
+model Payment {
+  id                 Int           @id @default(autoincrement())
+  bookingId          Int           @map("booking_id")
+  booking            Booking       @relation(fields: [bookingId], references: [id])
+  providerReference  String        @unique @default(uuid()) @map("provider_reference")
+  amount             Float
+  status             PaymentStatus @default(PENDING)
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
+
+  @@map("payments")
+}
+
+// Every webhook delivery we've successfully processed, keyed by the provider's
+// event_id. Lets the webhook handler be idempotent under at-least-once delivery.
+model WebhookEvent {
+  id          Int      @id @default(autoincrement())
+  eventId     String   @unique @map("event_id")
+  payload     Json
+  processedAt DateTime @default(now()) @map("processed_at")
+
+  @@map("webhook_events")
+}
