@@ -1,5 +1,5 @@
 const express = require('express');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 const { body } = require('express-validator');
 
 const prisma = require('../prisma');
@@ -39,7 +39,7 @@ router.post(
       // Simulate the payment provider's outcome. `forceStatus` is a test-only
       // hook to make outcomes deterministic in tests/demos; real callers omit it.
       const outcome = forceStatus || (Math.random() < 0.7 ? 'SUCCESS' : 'FAILED');
-      const eventId = uuidv4();
+      const eventId = randomUUID();
 
       const { payment: finalPayment, booking: finalBooking } = await processPaymentEvent({
         eventId,

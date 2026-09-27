@@ -46,6 +46,29 @@ This boots a PostgreSQL container alongside the Express API, automatically execu
 | POST | `/auth/signup` | No | Register new user account |
 | POST | `/auth/login` | No | Authenticate user & receive JWT bearer token |
 
+**Example Request — Signup (`POST /auth/signup`):**
+```json
+{
+  "email": "patient@example.com",
+  "password": "securepassword123"
+}
+```
+
+**Example Request — Login (`POST /auth/login`):**
+```json
+{
+  "email": "patient@example.com",
+  "password": "securepassword123"
+}
+```
+*Response:*
+```json
+{
+  "access_token": "<jwt_token>",
+  "token_type": "bearer"
+}
+```
+
 ### Diagnostic Centres & Tests
 | Method | Path | Auth Required | Description |
 |---|---|---|---|
@@ -55,6 +78,22 @@ This boots a PostgreSQL container alongside the Express API, automatically execu
 | POST | `/centres/:id/tests` | Yes | Add diagnostic test to centre |
 | GET | `/centres/:id/tests` | No | List tests for a specific centre |
 
+**Example Request — Create Centre (`POST /centres/`):**
+```json
+{
+  "name": "Apollo Diagnostics",
+  "location": "New Delhi"
+}
+```
+
+**Example Request — Add Test (`POST /centres/1/tests`):**
+```json
+{
+  "name": "Complete Blood Count (CBC)",
+  "price": 499.00
+}
+```
+
 ### Bookings
 | Method | Path | Auth Required | Description |
 |---|---|---|---|
@@ -63,11 +102,36 @@ This boots a PostgreSQL container alongside the Express API, automatically execu
 | GET | `/bookings/:id` | Yes | Retrieve booking details |
 | POST | `/bookings/:id/cancel` | Yes | Cancel pending booking |
 
-### Payments
+**Example Request — Create Booking (`POST /bookings/`):**
+```json
+{
+  "testId": 1,
+  "appointmentTime": "2026-10-15T10:00:00Z"
+}
+```
+
+### Payments & Webhook
 | Method | Path | Auth Required | Description |
 |---|---|---|---|
 | POST | `/payments/` | Yes | Initiate simulated payment |
 | POST | `/payments/webhook` | No | Idempotent payment webhook callback |
+
+**Example Request — Initiate Payment (`POST /payments/`):**
+```json
+{
+  "bookingId": 1,
+  "forceStatus": "SUCCESS"
+}
+```
+
+**Example Request — Provider Webhook (`POST /payments/webhook`):**
+```json
+{
+  "eventId": "3c914d2e-8b1a-4d76-9c44-e21b8f09d812",
+  "providerReference": "9a2f7c11-41b2-4d89-a5e2-0c9f8d11e223",
+  "status": "SUCCESS"
+}
+```
 
 ## 4. Database Schema
 
