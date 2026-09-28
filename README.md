@@ -409,25 +409,9 @@ erDiagram
 
 ---
 
-## 6. What You Would Improve If You Had More Time
+## 6. What I Would Improve With More Time
 
-1. **Role-Based Access Control (RBAC)**:
-   - Separate `PATIENT` and `ADMIN` / `LAB_OWNER` roles so only authorized staff can register centres or update test pricing.
-
-2. **HMAC Webhook Signature Verification**:
-   - Validate incoming webhook requests using a shared secret signature (e.g. `X-Signature: sha256=...`) to prevent forged payment events.
-
-3. **Background Job Queue & Retries**:
-   - Integrate Redis + BullMQ (or Celery) for asynchronous webhook handling and automatic retry with exponential backoff on transient failures.
-
-4. **Redis Catalog Caching**:
-   - Cache public read-heavy diagnostic centre listings (`GET /centres`) in Redis with invalidation on updates to improve performance under load.
-
-5. **Swagger / OpenAPI Documentation**:
-   - Add `@fastify/swagger` or `swagger-ui-express` to serve interactive API documentation directly at `/docs`.
-
-6. **Rate Limiting**:
-   - Implement rate limiting (`express-rate-limit`) on authentication (`/auth/login`) and payment endpoints to guard against brute-force attacks and abuse.
-
-7. **Structured Logging & Metrics**:
-   - Replace standard `console.error` with a structured logger like `pino` or `winston` and add Prometheus metrics for monitoring API performance and webhook latency.
+1. **Add role-based permissions**: I would separate patient and admin accounts so only admins can create diagnostic centres or change test details.
+2. **Verify payment webhooks**: I would check a shared secret signature before accepting a payment update, helping prevent fake webhook requests.
+3. **Expand automated tests**: I would add more Jest and Supertest cases for invalid input and booking or payment edge cases.
+4. **Improve validation and error handling**: I would return consistent, clear error responses when a request is invalid or cannot be completed.
